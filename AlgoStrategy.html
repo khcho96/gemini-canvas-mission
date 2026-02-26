@@ -120,7 +120,24 @@
                         <a id="problem-link" target="_blank" class="text-[11px] text-blue-600 hover:text-blue-800 font-black flex items-center gap-1 ml-auto transition-colors border-b border-blue-200">문제 원문 보기 🔗</a>
                     </div>
                     <h3 id="problem-title" class="text-xl sm:text-2xl font-black text-slate-900 mb-5 border-b border-slate-200 pb-4 leading-tight tracking-tight"></h3>
-                    <div id="problem-content" class="text-slate-800 text-[14px] sm:text-[15px] leading-relaxed max-h-[50vh] overflow-y-auto custom-scrollbar pr-4"></div>
+                    
+                    <!-- 문제 내용을 설명, 입력, 출력 3가지 파트로 분리 -->
+                    <div class="custom-scrollbar max-h-[50vh] overflow-y-auto pr-4 space-y-6">
+                        <div>
+                            <h4 class="text-xs font-black text-blue-600 tracking-widest uppercase mb-2">문제 설명</h4>
+                            <div id="problem-description" class="text-slate-800 text-[14px] sm:text-[15px] leading-relaxed"></div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white border border-slate-200 p-4 rounded-[1rem] shadow-sm">
+                                <h4 class="text-xs font-black text-slate-500 tracking-widest uppercase mb-2 border-b border-slate-100 pb-2">입력</h4>
+                                <div id="problem-input" class="text-slate-800 text-[13px] sm:text-[14px] leading-relaxed"></div>
+                            </div>
+                            <div class="bg-white border border-slate-200 p-4 rounded-[1rem] shadow-sm">
+                                <h4 class="text-xs font-black text-slate-500 tracking-widest uppercase mb-2 border-b border-slate-100 pb-2">출력</h4>
+                                <div id="problem-output" class="text-slate-800 text-[13px] sm:text-[14px] leading-relaxed"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="space-y-6">
@@ -271,16 +288,20 @@
             const sys = `당신은 알고리즘 전문가입니다. 반드시 구글 검색을 사용하여 다음 난이도 기준을 엄격히 준수하여 실존 기출 문제를 찾으세요. 
             난이도 기준: ${strictTiers}
             URL과 제목이 정확해야 합니다. ${exclusionList}
+            [매우 중요]: 문제 내용을 가져올 때는 '문제 설명', '입력', '출력', '제한사항' 등의 원문 텍스트를 한 글자의 가감, 요약, 변형 없이 100% 동일하게 복사하세요. 불필요한 서론이나 해설을 절대 덧붙이지 마십시오. 원문과 철저히 대조하십시오.
             모든 수식은 MathJax($)를 사용하되, 마크다운의 줄바꿈(\\n)이 유효한 JSON 문자열 내에서 깨지지 않도록 정확히 작성하세요. 
             JSON 응답 시 백슬래시는 반드시 이중 백슬래시(\\\\)로 처리하여 유효한 형식을 유지하십시오.`;
 
+            // 프롬프트를 수정하여 설명, 입력, 출력을 별도의 JSON 필드로 요구합니다.
             const user = `실제로 존재하는 ${levelDesc} 문제를 찾아 다음 JSON으로만 응답하세요:
             {
                 "platform": "사이트명",
                 "origin_level": "실제 티어/레벨 (예: 실버3, Lv2)",
                 "title": "실제 제목",
                 "url": "정확한 URL",
-                "content": "마크다운 문제 원문 (수식 필수 포함, 줄바꿈은 \\n 사용)",
+                "description": "문제 설명 원문 100% 복사 (요약/설명 추가 절대 금지, 수식은 $, 줄바꿈은 \\n 사용)",
+                "input": "입력 조건 원문 100% 복사 (수식은 $, 줄바꿈은 \\n 사용)",
+                "output": "출력 조건 원문 100% 복사 (수식은 $, 줄바꿈은 \\n 사용)",
                 "options": ["매우 구체적인 알고리즘 기법 6개"],
                 "correct_answer": "6개 중 정답"
             }`;
@@ -302,7 +323,10 @@
             document.getElementById('problem-title').innerText = currentProblem.title;
             document.getElementById('problem-link').href = currentProblem.url;
             
-            renderMarkdown('problem-content', currentProblem.content);
+            // 분리된 내용을 각각의 요소에 렌더링합니다.
+            renderMarkdown('problem-description', currentProblem.description || "문제 설명이 제공되지 않았습니다.");
+            renderMarkdown('problem-input', currentProblem.input || "입력 조건이 제공되지 않았습니다.");
+            renderMarkdown('problem-output', currentProblem.output || "출력 조건이 제공되지 않았습니다.");
 
             const grid = document.getElementById('option-grid');
             grid.innerHTML = '';
