@@ -90,7 +90,7 @@ https://gemini.google.com/share/f8df571ec196
 
 ---
 
-AI 사용 일지
+## AI 사용 일지
 
 ### 대상 앱 이름
 AlgoStrategy
